@@ -67,15 +67,29 @@ const ProductManagement = () => {
     rejectedReason: null,
   });
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setNewProduct((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const target = e.target;
+    const { name, value, type } = target;
+
+    if (target instanceof HTMLInputElement) {
+      const checked = target.checked;
+      setNewProduct((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    } else {
+      setNewProduct((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
-  const handleAddProduct = (e) => {
+  const handleAddProduct = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const newId = `PRD${String(products.length + 1).padStart(3, "0")}`;
     const productToAdd = {
@@ -219,134 +233,139 @@ const ProductManagement = () => {
             <h3 className="text-lg font-semibold text-gray-600 mb-4">
               Add New Product
             </h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={newProduct.title}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Descriptions
-                </label>
-                <textarea
-                  name="descriptions"
-                  value={newProduct.descriptions}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Category
-                </label>
-                <select
-                  name="categoryName"
-                  value={newProduct.categoryName}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
-                  required
-                >
-                  <option value="" disabled>
-                    Select a category
-                  </option>
-                  {initialCategories.map((category) => (
-                    <option key={category.id} value={category.name}>
-                      {category.name}
+            <form onSubmit={handleAddProduct}>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={newProduct.title}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Descriptions
+                  </label>
+                  <textarea
+                    name="descriptions"
+                    value={newProduct.descriptions}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Category
+                  </label>
+                  <select
+                    name="categoryName"
+                    value={newProduct.categoryName}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
+                    required
+                  >
+                    <option value="" disabled>
+                      Select a category
                     </option>
-                  ))}
-                </select>
+                    {initialCategories.map((category) => (
+                      <option key={category.id} value={category.name}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Price ($)
+                  </label>
+                  <input
+                    type="number"
+                    name="price"
+                    value={newProduct.price}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Condition
+                  </label>
+                  <select
+                    name="condition"
+                    value={newProduct.condition}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
+                  >
+                    <option value="New">New</option>
+                    <option value="Used">Used</option>
+                    <option value="Refurbished">Refurbished</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Locations
+                  </label>
+                  <input
+                    type="text"
+                    name="locations"
+                    value={newProduct.locations}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Active Status
+                  </label>
+                  <input
+                    type="checkbox"
+                    name="isActive"
+                    checked={newProduct.isActive}
+                    onChange={handleInputChange}
+                    className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Is Active</span>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Approved Status
+                  </label>
+                  <input
+                    type="checkbox"
+                    name="isApproved"
+                    checked={newProduct.isApproved}
+                    onChange={handleInputChange}
+                    className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    Is Approved
+                  </span>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Price ($)
-                </label>
-                <input
-                  type="number"
-                  name="price"
-                  value={newProduct.price}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Condition
-                </label>
-                <select
-                  name="condition"
-                  value={newProduct.condition}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
+              <div className="mt-6 flex justify-end space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
                 >
-                  <option value="New">New</option>
-                  <option value="Used">Used</option>
-                  <option value="Refurbished">Refurbished</option>
-                </select>
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Add Product
+                </button>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Locations
-                </label>
-                <input
-                  type="text"
-                  name="locations"
-                  value={newProduct.locations}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Active Status
-                </label>
-                <input
-                  type="checkbox"
-                  name="isActive"
-                  checked={newProduct.isActive}
-                  onChange={handleInputChange}
-                  className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-gray-700">Is Active</span>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Approved Status
-                </label>
-                <input
-                  type="checkbox"
-                  name="isApproved"
-                  checked={newProduct.isApproved}
-                  onChange={handleInputChange}
-                  className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className="ml-2 text-sm text-gray-700">Is Approved</span>
-              </div>
-            </div>
-            <div className="mt-6 flex justify-end space-x-2">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddProduct}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Add Product
-              </button>
-            </div>
+            </form>
           </div>
         </div>
       )}
