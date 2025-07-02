@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
 const initialCategories = [
-  { id: "CAT0018768776", name: "Clothing", description: "All clothing items" },
+  { id: "CAT001", name: "Clothing", description: "All clothing items" },
   { id: "CAT002", name: "Electronics", description: "Electronic devices" },
-  { id: "CAT003345353534", name: "Books", description: "Books and literature" },
+  { id: "CAT003", name: "Books", description: "Books and literature" },
 ];
 
 const CategoryManagement = () => {
@@ -100,7 +100,9 @@ const CategoryManagement = () => {
             onClick={() => setShowModal(false)}
           ></div>
           <div className="relative bg-white rounded-lg p-6 w-full max-w-md z-50">
-            <h3 className="text-lg font-semibold mb-4">Add New Category</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              Add New Category
+            </h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -111,7 +113,7 @@ const CategoryManagement = () => {
                   name="name"
                   value={newCategory.name}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
                   required
                 />
               </div>
@@ -124,7 +126,7 @@ const CategoryManagement = () => {
                   name="description"
                   value={newCategory.description}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 text-gray-900"
                 />
               </div>
             </div>

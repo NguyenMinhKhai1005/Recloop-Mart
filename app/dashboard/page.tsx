@@ -1,9 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import UserManagement from "../components/ADMIN/UserManagement";
-import ProductManagement from "../components/ADMIN/ProductManagement";
-import ReportsFlags from "../components/ADMIN/ReportsFlags";
-import CategoryManagement from "../components/ADMIN/CategoryManagement";
+import UserManagement from "../../components/ADMIN/UserManagement";
+import ProductManagement from "../../components/ADMIN/ProductManagement";
+import ReportsFlags from "../../components/ADMIN/ReportsFlags";
+import CategoryManagement from "../../components/ADMIN/CategoryManagement";
 
 import {
   LayoutDashboard,
@@ -94,7 +94,7 @@ const AdminDashboard = () => {
                 <Menu className="w-5 h-5 text-gray-600" />
               </button>
               <h2 className="text-2xl font-semibold text-gray-800">
-                Welcome back
+                Welcome back, Admin
               </h2>
             </div>
 
