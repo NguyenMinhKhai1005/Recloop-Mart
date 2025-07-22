@@ -57,22 +57,49 @@ export default function VerifyOtpPage() {
     }
 
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const res = await fetch("https://localhost:7235/api/Auth/verify-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp: otpString }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setMessage(data?.message || "OTP verification failed");
+        setIsLoading(false);
+        return;
+      }
       setMessage("Email verified successfully!");
+      setIsLoading(false);
       setTimeout(() => {
-        // Clear stored email
         sessionStorage.removeItem("registerEmail");
         router.push("/login");
         setMessage("");
       }, 1500);
-    }, 2000);
+    } catch {
+      setIsLoading(false);
+      setMessage("OTP verification failed");
+    }
   };
 
-  const resendOtp = () => {
-    setMessage("OTP resent successfully!");
-    setTimeout(() => setMessage(""), 3000);
+  const resendOtp = async () => {
+    setMessage("");
+    try {
+      const res = await fetch("https://localhost:7235/api/Auth/resend-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setMessage(data?.message || "Failed to resend OTP");
+        return;
+      }
+      setMessage("OTP resent successfully!");
+      setTimeout(() => setMessage(""), 3000);
+    } catch {
+      setMessage("Failed to resend OTP");
+    }
   };
 
   if (!email) {
