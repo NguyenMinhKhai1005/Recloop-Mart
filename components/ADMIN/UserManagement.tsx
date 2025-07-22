@@ -90,63 +90,77 @@ const UserManagement = () => {
     setDetailUser(null);
   }
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-          User Management
-        </h2>
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      {/* Modern Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
+        <div className="flex items-center space-x-4">
+          {/* Search Bar */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search users..."
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm w-64"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
 
       {loading && (
-        <div className="px-6 py-4 text-center">
+        <div className="text-center py-8">
           <p className="text-gray-500">Loading users...</p>
         </div>
       )}
 
       {error && (
-        <div className="px-6 py-4 bg-red-50 border border-red-200 rounded-md mx-6">
-          <p className="text-red-600">Error: {error}</p>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <p className="text-red-700">Error: {error}</p>
         </div>
       )}
 
       {!loading && !error && users.length === 0 && (
-        <div className="px-6 py-4 text-center">
+        <div className="text-center py-8">
           <p className="text-gray-500">No users found</p>
         </div>
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full border border-gray-300">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-200">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 User ID
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Email
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Role
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody>
             {users && users.length > 0 ? (
               users.map((user: UserResponse) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 text-sm text-gray-600">
                     {user.id}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-600">
                     {editingUser === user.id ? (
                       <input
                         type="text"
@@ -160,10 +174,10 @@ const UserManagement = () => {
                       user.fullName
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-600">
                     {user.email}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-600">
                     {editingUser === user.id ? (
                       <select
                         value={editForm.role}
@@ -177,10 +191,10 @@ const UserManagement = () => {
                       </select>
                     ) : (
                       <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
                           user.role === "admin"
-                            ? "bg-purple-100 text-purple-800"
-                            : "bg-blue-100 text-blue-800"
+                            ? "bg-indigo-100 text-indigo-700"
+                            : "bg-blue-100 text-blue-700"
                         }`}
                       >
                         {user.role}
@@ -188,31 +202,31 @@ const UserManagement = () => {
                     )}
                   </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4">
                     <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
                         user.isLocked === true
-                          ? "bg-red-100 text-red-800"
-                          : "bg-green-100 text-green-800"
+                          ? "bg-red-100 text-red-700"
+                          : "bg-green-100 text-green-700"
                       }`}
                     >
                       {user.isLocked === true ? "Locked" : "Active"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div className="flex space-x-2">
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-1">
                       {editingUser === user.id ? (
                         <>
                           <button
                             onClick={() => handleSaveEdit(user.id)}
-                            className="text-green-600 hover:text-green-800 p-1 rounded"
+                            className="p-2 rounded-full text-green-600 hover:bg-green-100 transition-colors"
                             title="Save changes"
                           >
                             <Save size={16} />
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="text-gray-600 hover:text-gray-800 p-1 rounded"
+                            className="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors"
                             title="Cancel"
                           >
                             <X size={16} />
@@ -222,29 +236,29 @@ const UserManagement = () => {
                         <>
                           <button
                             onClick={() => handleViewUser(user)}
-                            className="text-blue-600 hover:text-blue-800 p-1 rounded"
-                            title="View user details"
+                            className="p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition-colors"
+                            title="View Details"
                           >
                             <Eye size={16} />
                           </button>
                           <button
                             onClick={() => handleEditUser(user)}
-                            className="text-yellow-600 hover:text-yellow-800 p-1 rounded"
-                            title="Edit user"
+                            className="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors"
+                            title="Edit"
                           >
                             <Edit size={16} />
                           </button>
                           <button
                             onClick={(e) => handleToggleLock(user.id, e)}
-                            className={`p-1 rounded ${
+                            className={`p-2 rounded-full transition-colors ${
                               user.isLocked === true
-                                ? "text-red-600 hover:text-red-800"
-                                : "text-green-600 hover:text-green-800"
+                                ? "text-red-600 hover:bg-red-100"
+                                : "text-green-600 hover:bg-green-100"
                             }`}
                             title={
                               user.isLocked === true
-                                ? "Unlock user"
-                                : "Lock user"
+                                ? "Unlock"
+                                : "Lock"
                             }
                             type="button"
                           >
@@ -262,7 +276,7 @@ const UserManagement = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="px-6 py-4 text-center text-gray-500">
+                <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                   No users to display
                 </td>
               </tr>
@@ -273,13 +287,17 @@ const UserManagement = () => {
 
       {/* User Detail Modal */}
       {detailUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 max-w-md">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">User Details</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-gray-600 bg-opacity-50 backdrop-blur-sm"
+            onClick={closeDetailModal}
+          ></div>
+          <div className="relative bg-white rounded-xl shadow-xl p-6 w-96 max-w-md z-50">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-700">User Details</h3>
               <button
                 onClick={closeDetailModal}
-                className="text-gray-400 hover:text-gray-600"
+                className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 <X size={20} />
               </button>

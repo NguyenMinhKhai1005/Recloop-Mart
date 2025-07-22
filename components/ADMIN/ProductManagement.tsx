@@ -76,19 +76,19 @@ const AdminProductManagement = () => {
   const getStatusBadge = (product: Product) => {
     if (product.rejectedReason) {
       return (
-        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+        <span className="inline-flex px-2.5 py-1 text-xs font-medium rounded-full bg-red-100 text-red-700">
           Rejected
         </span>
       );
     } else if (product.isApproved) {
       return (
-        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+        <span className="inline-flex px-2.5 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
           Approved
         </span>
       );
     } else {
       return (
-        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+        <span className="inline-flex px-2.5 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">
           Pending
         </span>
       );
@@ -98,98 +98,110 @@ const AdminProductManagement = () => {
   return (
     <div className="relative">
       <div
-        className={`bg-white rounded-lg shadow-sm border border-gray-200 ${
+        className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${
           showDetailModal || showRejectModal ? "blur-sm" : ""
         }`}
       >
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold text-gray-800">
-              Product Management - Admin
-            </h2>
+        {/* Modern Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Product Management - Admin</h1>
+          <div className="flex items-center space-x-4">
+            {/* Search Bar */}
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm w-64"
+              />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </div>
             <button
               onClick={() => {
                 const token = getAuthToken();
                 if (token) dispatch(fetchProducts(token));
               }}
               disabled={loading}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 font-medium transition-colors"
             >
               {loading ? "Loading..." : "Refresh"}
             </button>
           </div>
+        </div>
 
-          {/* Filter Tabs */}
-          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-            {[
-              { key: "all", label: "All Products" },
-              { key: "pending", label: "Pending" },
-              { key: "approved", label: "Approved" },
-              { key: "rejected", label: "Rejected" },
-            ].map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setFilter(key)}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  filter === key
-                    ? "bg-white text-blue-600 shadow-sm"
-                    : "text-gray-600 hover:text-gray-800"
-                }`}
-              >
-                {label} (
-                {
-                  products.filter((p: Product) => {
-                    switch (key) {
-                      case "pending":
-                        return !p.isApproved && !p.rejectedReason;
-                      case "approved":
-                        return p.isApproved;
-                      case "rejected":
-                        return p.rejectedReason;
-                      default:
-                        return true;
-                    }
-                  }).length
-                }
-                )
-              </button>
-            ))}
-          </div>
+        {/* Filter Tabs */}
+        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-6">
+          {[
+            { key: "all", label: "All Products" },
+            { key: "pending", label: "Pending" },
+            { key: "approved", label: "Approved" },
+            { key: "rejected", label: "Rejected" },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setFilter(key)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                filter === key
+                  ? "bg-indigo-100 text-indigo-700 shadow-sm"
+                  : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+              }`}
+            >
+              {label} (
+              {
+                products.filter((p: Product) => {
+                  switch (key) {
+                    case "pending":
+                      return !p.isApproved && !p.rejectedReason;
+                    case "approved":
+                      return p.isApproved;
+                    case "rejected":
+                      return p.rejectedReason;
+                    default:
+                      return true;
+                  }
+                }).length
+              }
+              )
+            </button>
+          ))}
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Product Info
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Category
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Price
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Condition
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Location
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Created At
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody>
               {filteredProducts.map((product: Product) => (
-                <tr key={product.id} className="hover:bg-gray-50">
+                <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <div>
                       <div className="text-sm font-medium text-gray-900">
@@ -200,39 +212,39 @@ const AdminProductManagement = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-600">
                     {product.categoryName}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-600">
                     ${product.price}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4">
                     <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        product.condition === "New"
-                          ? "bg-green-100 text-green-800"
-                          : product.condition === "Used"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-blue-100 text-blue-800"
+                      className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${
+                        product.condition === "new"
+                          ? "bg-green-100 text-green-700"
+                          : product.condition === "used"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-blue-100 text-blue-700"
                       }`}
                     >
                       {product.condition}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-600">
                     {product.locations}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4">
                     {getStatusBadge(product)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 text-sm text-gray-600">
                     {formatDate(product.createdAt)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center space-x-1">
                       <button
                         onClick={() => handleViewDetails(product)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition-colors"
                         title="View Details"
                       >
                         <Eye size={16} />
@@ -242,7 +254,7 @@ const AdminProductManagement = () => {
                         <>
                           <button
                             onClick={() => handleApprove(product.id)}
-                            className="text-green-600 hover:text-green-900"
+                            className="p-2 rounded-full text-green-600 hover:bg-green-100 transition-colors"
                             title="Approve"
                             disabled={loading}
                           >
@@ -250,7 +262,7 @@ const AdminProductManagement = () => {
                           </button>
                           <button
                             onClick={() => handleReject(product)}
-                            className="text-red-600 hover:text-red-900"
+                            className="p-2 rounded-full text-red-600 hover:bg-red-100 transition-colors"
                             title="Reject"
                             disabled={loading}
                           >
@@ -282,14 +294,14 @@ const AdminProductManagement = () => {
             className="absolute inset-0 bg-gray-600 bg-opacity-50 backdrop-blur-sm"
             onClick={() => setShowDetailModal(false)}
           ></div>
-          <div className="relative bg-white rounded-lg p-6 w-full max-w-2xl z-50 max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold text-gray-600">
+          <div className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl z-50 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-start mb-6">
+              <h3 className="text-lg font-semibold text-gray-700">
                 Product Details
               </h3>
               <button
                 onClick={() => setShowDetailModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 <X size={24} />
               </button>
@@ -402,10 +414,10 @@ const AdminProductManagement = () => {
             </div>
 
             {!selectedProduct.isApproved && !selectedProduct.rejectedReason && (
-              <div className="mt-6 flex justify-end space-x-2">
+              <div className="mt-6 flex justify-end space-x-3">
                 <button
                   onClick={() => handleApprove(selectedProduct.id)}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors"
                   disabled={loading}
                 >
                   Approve
@@ -415,7 +427,7 @@ const AdminProductManagement = () => {
                     setShowDetailModal(false);
                     handleReject(selectedProduct);
                   }}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
                   disabled={loading}
                 >
                   Reject
@@ -433,28 +445,28 @@ const AdminProductManagement = () => {
             className="absolute inset-0 bg-gray-600 bg-opacity-50 backdrop-blur-sm"
             onClick={() => setShowRejectModal(false)}
           ></div>
-          <div className="relative bg-white rounded-lg p-6 w-full max-w-md z-50">
-            <h3 className="text-lg font-semibold text-gray-600 mb-4">
+          <div className="relative bg-white rounded-xl shadow-xl p-6 w-full max-w-md z-50">
+            <h3 className="text-lg font-semibold text-gray-700 mb-6">
               Reject Product: {selectedProduct.title}
             </h3>
             <div>
-              <div className="mb-4">
+              <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Rejection Reason *
                 </label>
                 <textarea
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   rows={4}
                   placeholder="Please provide a reason for rejection..."
                 />
               </div>
-              <div className="flex justify-end space-x-2">
+              <div className="flex justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => setShowRejectModal(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -475,7 +487,7 @@ const AdminProductManagement = () => {
                       setRejectReason("");
                     }
                   }}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors"
                   disabled={loading || !rejectReason.trim()}
                 >
                   {loading ? "Rejecting..." : "Reject Product"}

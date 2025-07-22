@@ -241,109 +241,108 @@ const CategoryManagement = () => {
       )}
 
       <div
-        className={`bg-white rounded-lg shadow-sm border border-gray-200 ${
+        className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${
           showModal ? "blur-sm" : ""
         }`}
       >
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h2 className="text-2xl font-semibold text-gray-800">
-              Category Management
-            </h2>
-            <div className="flex items-center gap-4">
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search categories..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                />
-              </div>
-              {/* Add Button */}
-              <button
-                onClick={openCreateModal}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Add Category
-              </button>
+        {/* Modern Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">
+            Category Management
+          </h1>
+          <div className="flex items-center space-x-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search categories..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm w-64"
+              />
             </div>
+            {/* Add Button */}
+            <button
+              onClick={openCreateModal}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 font-medium"
+            >
+              <Plus className="w-4 h-4" />
+              Add Category
+            </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-6">
-          {categoryState.loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-              <span className="ml-2 text-gray-600">Loading categories...</span>
-            </div>
-          ) : (
-            <>
-              {filteredCategories.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-gray-500">
-                    {searchTerm
-                      ? "No categories found matching your search."
-                      : "No categories available."}
-                  </div>
+        {categoryState.loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+            <span className="ml-2 text-gray-600">Loading categories...</span>
+          </div>
+        ) : (
+          <>
+            {filteredCategories.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-gray-500">
+                  {searchTerm
+                    ? "No categories found matching your search."
+                    : "No categories available."}
                 </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          ID
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        ID
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Name
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCategories.map((category) => (
+                      <tr
+                        key={category.id}
+                        className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {category.id}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {category.name}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          <div className="flex items-center space-x-1">
+                            <button
+                              onClick={() => openEditModal(category)}
+                              className="p-2 rounded-full text-indigo-600 hover:bg-indigo-100 transition-colors"
+                              title="Edit"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => deleteCategory(category.id)}
+                              className="p-2 rounded-full text-red-600 hover:bg-red-100 transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredCategories.map((category) => (
-                        <tr key={category.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {category.id}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {category.name}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => openEditModal(category)}
-                                className="text-blue-600 hover:text-blue-800 p-1"
-                                title="Edit category"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => deleteCategory(category.id)}
-                                className="text-red-600 hover:text-red-800 p-1"
-                                title="Delete category"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Modal */}
@@ -353,13 +352,13 @@ const CategoryManagement = () => {
             className="absolute inset-0 bg-gray-600 bg-opacity-50 backdrop-blur-sm"
             onClick={closeModal}
           />
-          <div className="relative bg-white rounded-lg p-6 w-full max-w-md z-50 shadow-xl">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          <div className="relative bg-white rounded-xl p-6 w-full max-w-md z-50 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-700 mb-6">
               {editingCategory ? "Edit Category" : "Add New Category"}
             </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Category Name *
                 </label>
                 <input
@@ -367,16 +366,16 @@ const CategoryManagement = () => {
                   name="name"
                   value={newCategory.name}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
                   placeholder="Enter category name"
                   required
                 />
               </div>
-              <div className="flex justify-end space-x-2 pt-4">
+              <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -384,7 +383,7 @@ const CategoryManagement = () => {
                   type="button"
                   onClick={handleSubmit}
                   disabled={actionLoading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
                 >
                   {actionLoading && (
                     <Loader2 className="w-4 h-4 animate-spin" />
