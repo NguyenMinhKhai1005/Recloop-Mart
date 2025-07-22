@@ -18,7 +18,9 @@ const AdminProductManagement = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState("pending");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
 
   // Get token
   const getAuthToken = () =>
@@ -36,10 +38,14 @@ const AdminProductManagement = () => {
     if (token) dispatch(fetchProductById({ token, id: product.id }));
   };
 
-  const handleApprove = (id: number) => {
+  const handleApprove = async (id: number) => {
     if (window.confirm("Are you sure you want to approve this product?")) {
       const token = getAuthToken();
-      if (token) dispatch(approveProduct({ token, id }));
+      if (token) {
+        await dispatch(approveProduct({ token, id }));
+        // Auto refresh after approve
+        dispatch(fetchProducts(token));
+      }
     }
   };
 
@@ -48,7 +54,6 @@ const AdminProductManagement = () => {
     const token = getAuthToken();
     if (token) dispatch(fetchProductById({ token, id: product.id }));
   };
-
 
   const filteredProducts = products.filter((product: Product) => {
     switch (filter) {
@@ -62,6 +67,17 @@ const AdminProductManagement = () => {
         return true;
     }
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("vi-VN", {
@@ -107,22 +123,11 @@ const AdminProductManagement = () => {
             <h2 className="text-2xl font-semibold text-gray-800">
               Product Management - Admin
             </h2>
-            <button
-              onClick={() => {
-                const token = getAuthToken();
-                if (token) dispatch(fetchProducts(token));
-              }}
-              disabled={loading}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-            >
-              {loading ? "Loading..." : "Refresh"}
-            </button>
           </div>
 
           {/* Filter Tabs */}
           <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
             {[
-              { key: "all", label: "All Products" },
               { key: "pending", label: "Pending" },
               { key: "approved", label: "Approved" },
               { key: "rejected", label: "Rejected" },
@@ -188,7 +193,7 @@ const AdminProductManagement = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredProducts.map((product: Product) => (
+              {currentProducts.map((product: Product) => (
                 <tr key={product.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div>
@@ -271,6 +276,50 @@ const AdminProductManagement = () => {
             <p className="text-gray-500">
               No products found for the selected filter.
             </p>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Showing {startIndex + 1} to{" "}
+              {Math.min(endIndex, filteredProducts.length)} of{" "}
+              {filteredProducts.length} results
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setCurrentPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                Previous
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-3 py-1 border rounded-md text-sm ${
+                      currentPage === page
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+
+              <button
+                onClick={() => setCurrentPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -460,17 +509,20 @@ const AdminProductManagement = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={async () => {
                     if (rejectReason.trim() && selectedProduct) {
                       const token = getAuthToken();
-                      if (token)
-                        dispatch(
+                      if (token) {
+                        await dispatch(
                           rejectProduct({
                             token,
                             id: selectedProduct.id,
                             payload: { rejectedReason: rejectReason },
                           })
                         );
+                        // Auto refresh after reject
+                        dispatch(fetchProducts(token));
+                      }
                       setShowRejectModal(false);
                       setRejectReason("");
                     }

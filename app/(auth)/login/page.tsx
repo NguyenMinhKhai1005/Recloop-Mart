@@ -53,7 +53,15 @@ export default function LoginPage() {
         setMessage("Login successful! Redirecting...");
         setTimeout(() => {
           setMessage("");
-          router.push("/dashboard");
+          // Check user role and redirect accordingly
+          if (
+            response.user?.role === "admin" ||
+            response.user?.role === "Admin"
+          ) {
+            router.push("/dashboard");
+          } else {
+            router.push("/unauthorized");
+          }
         }, 1200);
       } else {
         // Nếu lỗi 401 (Unauthorized) thì chuyển sang xác thực OTP

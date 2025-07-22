@@ -79,10 +79,30 @@ export const deleteCategory = createAsyncThunk(
   async ({ token, id }: { token: string; id: number }, { rejectWithValue }) => {
     try {
       const data = await apiDeleteCategory(token, id);
-      return data;
+      return { id, data }; // Return ID for state update
     } catch (err: any) {
-      if (err && typeof err === "object" && "message" in err) {
-        return rejectWithValue(err.message);
+      console.error("Delete category thunk error:", err);
+      if (err && typeof err === "object") {
+        if ("status" in err && err.status === 500) {
+          // Check if it's a foreign key constraint error
+          if ("message" in err && typeof err.message === "string") {
+            if (
+              err.message.includes("REFERENCE constraint") ||
+              err.message.includes("FK__Products__Catego") ||
+              err.message.includes("contains products")
+            ) {
+              return rejectWithValue(
+                "Cannot delete this category because it contains products. Please move or delete all products in this category first."
+              );
+            }
+          }
+          return rejectWithValue(
+            "Cannot delete category due to database constraints. It may contain related data."
+          );
+        }
+        if ("message" in err) {
+          return rejectWithValue(err.message);
+        }
       }
       return rejectWithValue("Failed to delete category");
     }
@@ -114,7 +134,7 @@ const categorySlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(createCategory.fulfilled, (state, action) => {
+      .addCase(createCategory.fulfilled, (state) => {
         state.loading = false;
         // Sau khi tạo thành công, không cập nhật state.categories ở đây
         // Để đảm bảo đồng bộ dữ liệu mới nhất, hãy fetch lại toàn bộ danh sách ở component
@@ -139,7 +159,7 @@ const categorySlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(deleteCategory.fulfilled, (state, action) => {
+      .addCase(deleteCategory.fulfilled, (state) => {
         state.loading = false;
         // Không cập nhật state.categories ở đây, luôn fetch lại list ở component để đồng bộ tuyệt đối
       })

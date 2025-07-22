@@ -1,12 +1,10 @@
 "use client";
 
 import { useAuth } from "../../components/AuthProvider";
-import { useRouter } from "next/navigation";
-import { Shield, ArrowLeft, LogOut } from "lucide-react";
+import { Shield, LogOut } from "lucide-react";
 
 export default function UnauthorizedPage() {
   const { user, logout } = useAuth();
-  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -17,7 +15,7 @@ export default function UnauthorizedPage() {
             Access Denied
           </h1>
           <p className="text-gray-600">
-            You don't have permission to access this page.
+            You don&#39;t have permission to access this page.
           </p>
         </div>
 
@@ -32,21 +30,6 @@ export default function UnauthorizedPage() {
 
         <div className="space-y-3">
           <button
-            onClick={() => router.push("/")}
-            className="w-full flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Go to Home</span>
-          </button>
-
-          <button
-            onClick={() => router.back()}
-            className="w-full bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-          >
-            Go Back
-          </button>
-
-          <button
             onClick={logout}
             className="w-full flex items-center justify-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
           >
@@ -56,7 +39,9 @@ export default function UnauthorizedPage() {
         </div>
 
         <div className="mt-6 text-xs text-gray-500">
-          <p>If you believe this is an error, please contact your administrator.</p>
+          <p>
+            If you believe this is an error, please contact your administrator.
+          </p>
         </div>
       </div>
     </div>

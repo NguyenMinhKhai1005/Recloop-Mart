@@ -24,6 +24,8 @@ const CategoryManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
   const [newCategory, setNewCategory] = useState<CategoryRequest>({
     name: "",
   });
@@ -105,6 +107,12 @@ const CategoryManagement = () => {
       setActionLoading(true);
       const token = getAuthToken();
       if (!token) throw new Error("Unauthorized access. Please login again.");
+
+      console.log("✏️ Attempting to update category:", {
+        id: editingCategory.id,
+        payload: newCategory,
+      });
+
       const result = await dispatch(
         updateCategoryThunk({
           token,
@@ -112,6 +120,7 @@ const CategoryManagement = () => {
           payload: newCategory,
         })
       );
+
       if (updateCategoryThunk.fulfilled.match(result)) {
         await fetchCategoriesRedux();
         showMessage("success", "Category updated successfully");
@@ -119,12 +128,13 @@ const CategoryManagement = () => {
         setEditingCategory(null);
         setShowModal(false);
       } else {
-        showMessage(
-          "error",
-          (result.payload as string) || "Failed to update category"
-        );
+        console.error("Update failed with payload:", result.payload);
+        const errorMessage =
+          (result.payload as string) || "Failed to update category";
+        showMessage("error", errorMessage);
       }
     } catch (error) {
+      console.error("Update category error:", error);
       showMessage(
         "error",
         error instanceof Error ? error.message : "Failed to update category"
@@ -136,24 +146,37 @@ const CategoryManagement = () => {
 
   // Delete category
   const deleteCategory = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this category?")) {
+    const categoryToDelete = categoryState.categories.find(
+      (cat: Category) => cat.id === id
+    );
+    const categoryName = categoryToDelete ? categoryToDelete.name : `ID ${id}`;
+
+    if (
+      !window.confirm(
+        `Are you sure you want to delete the category "${categoryName}"?\n\nNote: This will fail if there are products in this category.`
+      )
+    ) {
       return;
     }
     try {
       setActionLoading(true);
       const token = getAuthToken();
       if (!token) throw new Error("Unauthorized access. Please login again.");
+
+      console.log("🗑️ Attempting to delete category ID:", id);
       const result = await dispatch(deleteCategoryThunk({ token, id }));
+
       if (deleteCategoryThunk.fulfilled.match(result)) {
         await fetchCategoriesRedux();
         showMessage("success", "Category deleted successfully");
       } else {
-        showMessage(
-          "error",
-          (result.payload as string) || "Failed to delete category"
-        );
+        console.error("Delete failed with payload:", result.payload);
+        const errorMessage =
+          (result.payload as string) || "Failed to delete category";
+        showMessage("error", errorMessage);
       }
     } catch (error) {
+      console.error("Delete category error:", error);
       showMessage(
         "error",
         error instanceof Error ? error.message : "Failed to delete category"
@@ -208,6 +231,17 @@ const CategoryManagement = () => {
         .includes(searchTerm.toLowerCase())
   );
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentCategories = filteredCategories.slice(startIndex, endIndex);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   // Load categories on component mount
   useEffect(() => {
     fetchCategoriesRedux();
@@ -260,7 +294,7 @@ const CategoryManagement = () => {
                   placeholder="Search categories..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-transparent text-gray-400"
                 />
               </div>
               {/* Add Button */}
@@ -309,7 +343,7 @@ const CategoryManagement = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {filteredCategories.map((category) => (
+                      {currentCategories.map((category) => (
                         <tr key={category.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {category.id}
@@ -342,6 +376,50 @@ const CategoryManagement = () => {
                 </div>
               )}
             </>
+          )}
+
+          {/* Pagination */}
+          {!categoryState.loading && totalPages > 1 && (
+            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+              <div className="text-sm text-gray-700">
+                Showing {startIndex + 1} to{" "}
+                {Math.min(endIndex, filteredCategories.length)} of{" "}
+                {filteredCategories.length} results
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 border border-gray-600 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-zinc-700"
+                >
+                  Previous
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-3 py-1 border rounded-md text-sm ${
+                        currentPage === page
+                          ? "bg-blue-600 text-white border-blue-600"
+                          : "border-gray-500 hover:bg-gray-200 text-zinc-700"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
+
+                <button
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 border border-gray-600 rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200 text-zinc-700"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
           )}
         </div>
       </div>

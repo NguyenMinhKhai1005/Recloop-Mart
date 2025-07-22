@@ -62,8 +62,24 @@ export async function updateCategory(
   id: number,
   payload: CategoryRequest
 ) {
-  const body = JSON.stringify({ id, ...payload });
-  console.log("Update category payload:", body);
+  // Validate payload
+  if (!payload.name || !payload.name.trim()) {
+    throw new Error("Category name is required");
+  }
+
+  // Trim whitespace and prepare payload
+  // Backend might expect only the name field, not the ID
+  const cleanPayload = {
+    name: payload.name.trim(),
+  };
+
+  const body = JSON.stringify(cleanPayload);
+  console.log("✏️ Update category request:", {
+    id,
+    payload: cleanPayload,
+    body,
+  });
+
   const res = await fetch(`${API_BASE_URL}/api/Category/${id}`, {
     method: "PUT",
     headers: {
@@ -72,12 +88,22 @@ export async function updateCategory(
     },
     body,
   });
+
   let data;
+  const contentType = res.headers.get("content-type");
+
   try {
-    data = await res.json();
-  } catch {
+    if (contentType && contentType.includes("application/json")) {
+      data = await res.json();
+    } else {
+      const textResponse = await res.text();
+      data = { message: textResponse };
+    }
+  } catch (parseError) {
+    console.error("Failed to parse response:", parseError);
     data = {};
   }
+
   if (!res.ok) {
     console.error("Update category error:", res.status, data);
     throw {
@@ -86,10 +112,13 @@ export async function updateCategory(
         data?.message || `Failed to update category (status ${res.status})`,
     };
   }
+
+  console.log("Update category success:", data);
   return data;
 }
 
 export async function deleteCategory(token: string, id: number) {
+  console.log("🗑️ Deleting category with ID:", id);
   const res = await fetch(`${API_BASE_URL}/api/Category/${id}`, {
     method: "DELETE",
     headers: {
@@ -97,17 +126,51 @@ export async function deleteCategory(token: string, id: number) {
       "Content-Type": "application/json",
     },
   });
+
+  console.log("Delete response status:", res.status);
+
   let data;
+  const contentType = res.headers.get("content-type");
+
   try {
-    data = await res.json();
-  } catch {
+    if (contentType && contentType.includes("application/json")) {
+      data = await res.json();
+    } else {
+      const textResponse = await res.text();
+      console.log("Delete category text response:", textResponse);
+      data = { message: textResponse };
+    }
+  } catch (parseError) {
+    console.error("Failed to parse delete response:", parseError);
     data = {};
   }
+
   if (!res.ok) {
+    console.error("Delete category error:", res.status, data);
+
+    // Handle specific error cases
+    let errorMessage =
+      data?.message || `Failed to delete category (status ${res.status})`;
+
+    if (res.status === 500 && data?.message) {
+      if (
+        data.message.includes("REFERENCE constraint") ||
+        data.message.includes("FK__Products__Catego")
+      ) {
+        errorMessage =
+          "Cannot delete this category because it contains products. Please move or delete all products in this category first.";
+      } else if (data.message.includes("DbUpdateException")) {
+        errorMessage =
+          "Cannot delete this category due to database constraints. It may contain related data.";
+      }
+    }
+
     throw {
       status: res.status,
-      message: data?.message || "Failed to delete category",
+      message: errorMessage,
     };
   }
+
+  console.log("Delete category success:", data);
   return data;
 }
