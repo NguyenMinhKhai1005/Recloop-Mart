@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { registerUser } from "../../../redux/slices/authSlice";
 import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface RegisterData {
   fullName: string;
@@ -15,6 +18,8 @@ interface RegisterData {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { loading: isLoading, error } = useAppSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [registerData, setRegisterData] = useState<RegisterData>({
@@ -24,7 +29,6 @@ export default function RegisterPage() {
     password: "",
     confirmPassword: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,23 +37,30 @@ export default function RegisterPage() {
 
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setMessage("");
     if (registerData.password !== registerData.confirmPassword) {
       setMessage("Passwords do not match!");
       return;
     }
-
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setMessage("Registration successful! Please verify your email.");
-      setTimeout(() => {
-        // Store email in sessionStorage for OTP page
-        sessionStorage.setItem("registerEmail", registerData.email);
-        router.push("/verify-otp");
+    try {
+      const resultAction = await dispatch(
+        registerUser({
+          email: registerData.email,
+          password: registerData.password,
+          fullName: registerData.fullName,
+        })
+      );
+      if (registerUser.fulfilled.match(resultAction)) {
         setMessage("");
-      }, 1500);
-    }, 2000);
+        // Lưu email vào sessionStorage để dùng cho xác thực OTP
+        sessionStorage.setItem("registerEmail", registerData.email);
+        router.push("/verify-otp-register");
+      } else {
+        setMessage((resultAction.payload as string) || "Registration failed");
+      }
+    } catch {
+      setMessage("Registration failed");
+    }
   };
 
   return (
@@ -58,7 +69,13 @@ export default function RegisterPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="bg-green-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <span className="text-white text-2xl font-bold">RM</span>
+            <Image
+              src="/logo-shop.png"
+              alt="Logo"
+              className="w-full h-full object-cover"
+              width={64}
+              height={64}
+            />
           </div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
             Create Account
@@ -228,7 +245,7 @@ export default function RegisterPage() {
             </button>
 
             {/* Message */}
-            {message && (
+            {(message || error) && (
               <div className="text-center">
                 <p
                   className={`text-sm ${
@@ -237,7 +254,7 @@ export default function RegisterPage() {
                       : "text-red-600"
                   }`}
                 >
-                  {message}
+                  {message || error}
                 </p>
               </div>
             )}
